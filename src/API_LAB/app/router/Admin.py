@@ -6,6 +6,7 @@ from app.api_key import require_admin
 from app.model.Usuario import UsuarioAct
 from app.model.especies import Especie as EspecieSchema, EspecieActualizar
 from app.model.fotografia import Fotografia
+from app.api_key import require_admin, require_api_key
 
 router = APIRouter(
     prefix="/admin",
@@ -211,3 +212,9 @@ def eliminar_comentario(
 
     cursor.execute("DELETE FROM Comentario WHERE id_comentario=%s", (id,))
     return {"mensaje": "Comentario eliminado"}
+
+@router.get("/zonas/publico")
+def obtener_zonas_publico(db=Depends(get_db), admin=Depends(require_admin)):
+    cursor = db.cursor()
+    cursor.execute("SELECT ID, nombre_region FROM Zonas ORDER BY ID")
+    return cursor.fetchall()

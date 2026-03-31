@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from app.database import get_db
 from app.api_key import require_api_key
-from app.model.Usuario import Usuario, UsuarioAct
+from app.model.Usuario import Usuario, UsuarioAct, UsuarioLogin
 
 router = APIRouter(prefix="/usuarios", tags=["Usuarios"])
 
@@ -106,3 +106,15 @@ def eliminar_usuario(id: int, db=Depends(get_db), user=Depends(require_api_key))
     
     cursor.execute("DELETE FROM Usuarios WHERE id=%s", (id,))
     return {"mensaje": "Usuario eliminado correctamente"}
+
+@router.post("/login")
+def login_usuario(datos: UsuarioLogin, db=Depends(get_db), user=Depends(require_api_key)):
+    cursor = db.cursor()
+    cursor.execute(
+        "SELECT * FROM Usuarios WHERE correo = %s AND contrasena = %s",
+        (datos.correo, datos.contrasena)
+    )
+    usuario = cursor.fetchone()
+    if not usuario:
+        raise HTTPException(status_code=401, detail="Credenciales incorrectas")
+    return usuario

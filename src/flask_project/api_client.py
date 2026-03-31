@@ -58,9 +58,25 @@ def get_comentarios_por_zona(id_zona):
 def crear_comentario(datos):
     return _post("/comentarios", datos)
 
+def like_comentario(id):
+    return _post(f"/comentarios/like/{id}", {})
+
+def editar_comentario(id, contenido):
+    return _post(f"/comentarios/editar/{id}", {"contenido": contenido})
+
+def eliminar_comentario(id):
+    try:
+        r = requests.delete(f"{API_URL}/comentarios/{id}", headers=HEADERS_USER, timeout=5)
+        return r.status_code == 200
+    except Exception:
+        return False
+
 # ── Usuarios ──────────────────────────────────────────────────
 def get_usuario(id):
     return _get(f"/usuarios/{id}")
 
 def crear_usuario(datos):
     return _post("/usuarios", datos)
+
+def login_usuario(correo, contrasena):
+    return _post("/usuarios/login", {"correo": correo, "contrasena": contrasena})

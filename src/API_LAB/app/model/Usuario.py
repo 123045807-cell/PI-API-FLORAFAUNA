@@ -15,3 +15,7 @@ class UsuarioAct(BaseModel):
     apellidoMaterno: Optional[str] = Field(None, max_length=100)
     correo: Optional[EmailStr]
     contrasena: Optional[str] = Field(None, min_length=6, max_length=255)
+
+class UsuarioLogin(BaseModel):
+    correo: str
+    contrasena: str

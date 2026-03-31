@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, redirect, url_for
+from flask import Flask, render_template, session, redirect, url_for, request, flash
 from config import Config
 import api_client as api
 
@@ -37,10 +37,10 @@ def inicio():
 @app.route("/inicio_usuario")
 def inicio_usuario():
     especies = api.get_especies()
-    flora      = sum(1 for e in especies if e.get("tipo") == 1)
-    fauna      = sum(1 for e in especies if e.get("tipo") == 2)
+    flora       = sum(1 for e in especies if e.get("tipo") == 1)
+    fauna       = sum(1 for e in especies if e.get("tipo") == 2)
     vulnerables = sum(1 for e in especies if e.get("id_estado_conservacion") in (3, 4, 5))
-    zonas      = len(ZONAS)
+    zonas       = len(ZONAS)
 
     stats = {"flora": flora, "fauna": fauna, "zonas": zonas, "vulnerables": vulnerables}
 
@@ -52,24 +52,60 @@ def inicio_usuario():
     return render_template("inicio_usuario.html", stats=stats, fotos=fotos)
 
 
-@app.route("/login")
+# ── Auth ──────────────────────────────────────────────────────
+
+@app.route("/login", methods=["GET", "POST"])
 def login():
+    if request.method == "POST":
+        correo    = request.form.get("correo")
+        contrasena = request.form.get("contraseña")
+        resultado = api.login_usuario(correo, contrasena)
+        if resultado:
+            session["usuario"] = resultado
+            session["rol"]     = resultado.get("rol")
+            flash("Inicio de sesión exitoso.", "success")
+            return redirect(url_for("inicio_usuario"))
+        else:
+            flash("Correo o contraseña incorrectos.", "error")
+            return redirect(url_for("login"))
     return render_template("login.html")
 
 
-@app.route("/registro")
+@app.route("/registro", methods=["GET", "POST"])
 def registro():
+    if request.method == "POST":
+        datos = {
+            "nombre":          request.form.get("nombre"),
+            "apellidoPaterno": request.form.get("ap_paterno"),
+            "apellidoMaterno": request.form.get("ap_materno"),
+            "correo":          request.form.get("correo"),
+            "contrasena":      request.form.get("contraseña"),
+        }
+        resultado = api.crear_usuario(datos)
+        if resultado:
+            flash("Cuenta creada exitosamente. Inicia sesión.", "success")
+            return redirect(url_for("login"))
+        else:
+            flash("Error al crear la cuenta. El correo puede estar en uso.", "error")
+            return redirect(url_for("registro"))
     return render_template("registro.html")
 
 
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+
+
+# ── Perfil ────────────────────────────────────────────────────
+
 @app.route("/perfil")
 def perfil():
-    usuario = {
-        "username": "Isabel",
-        "profile_image": "isabel.png"
-    }
+    usuario = session.get("usuario", {})
     return render_template("perfil.html", usuario=usuario)
 
+
+# ── Contenido ─────────────────────────────────────────────────
 
 @app.route("/mapa")
 def mapa():
@@ -87,12 +123,48 @@ def consejos():
     return render_template("consejos.html", consejos=consejos)
 
 
-@app.route("/comentarios")
+@app.route("/comentarios", methods=["GET", "POST"])
 def comentarios():
+    if request.method == "POST":
+        from datetime import date
+        datos = {
+            "Contenido":         request.form.get("contenido"),
+            "Fecha_publicacion": str(date.today()),
+            "ID_usuario":        session.get("usuario", {}).get("id"),
+            "ID_zona":           int(request.form.get("id_zona")),
+            "ID_estatus":        1
+        }
+        api.crear_comentario(datos)
+        flash("Comentario publicado.", "success")
+        return redirect(url_for("comentarios"))
+
     comentarios = api.get_comentarios()
-    return render_template("comentarios.html", comentarios=comentarios)
+    zonas = [{"ID": k, "nombre_region": v} for k, v in ZONAS.items()]
+    id_usuario = session.get("usuario", {}).get("id")
+    return render_template("comentarios.html", comentarios=comentarios, zonas=zonas, id_usuario=id_usuario)
 
 
+@app.route("/comentario/like/<int:id>", methods=["POST"])
+def like_comentario(id):
+    resultado = api.like_comentario(id)
+    if resultado:
+        return {"success": True}
+    return {"success": False}, 400
+
+
+@app.route("/comentario/eliminar/<int:id>", methods=["POST"])
+def eliminar_comentario(id):
+    api.eliminar_comentario(id)
+    flash("Comentario eliminado.", "success")
+    return redirect(url_for("comentarios"))
+
+
+@app.route("/comentario/editar/<int:id>", methods=["POST"])
+def editar_comentario(id):
+    contenido = request.form.get("contenido")
+    api.editar_comentario(id, contenido)
+    flash("Comentario actualizado.", "success")
+    return redirect(url_for("comentarios"))
 @app.route("/donaciones")
 def donaciones():
     return render_template("donaciones.html")
@@ -108,7 +180,7 @@ def membresias():
     return render_template("membresias.html")
 
 
-# ── Zonas (una sola ruta dinámica) ────────────────────────────
+# ── Zonas ─────────────────────────────────────────────────────
 
 @app.route("/zona/<int:id_zona>")
 def zona(id_zona):
@@ -126,14 +198,6 @@ def zona(id_zona):
         especies=especies,
         consejos=consejos,
     )
-
-
-# ── Auth ──────────────────────────────────────────────────────
-
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect(url_for("login"))
 
 
 if __name__ == "__main__":
