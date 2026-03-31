@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mi Perfil | Flora y Fauna Qro</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        html { width: 100%; overflow-x: hidden; }
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f7f0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-top: 60px;
+            width: 100%;
+            color: #333;
+        }
+        .navbar {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 2rem; background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); height: 60px; box-sizing: border-box;
+        }
+        .logo {
+            display: flex; align-items: center; font-weight: bold; font-size: 1.5rem;
+            font-family: 'Playfair Display', serif; color: #8C5E2A;
+        }
+        .logo img { height: 50px; margin-right: 15px; }
+        .links a {
+            text-decoration: none; color: #333; font-weight: 500; 
+            margin-left: 20px; font-size: 0.95rem; transition: color 0.3s;
+        }
+        .links a:hover { color: #8C5E2A; }
+        .page-header { text-align: center; padding: 40px 20px 10px; background: transparent; }
+        .page-header h1 { margin: 0; font-family: 'Playfair Display', serif; font-size: 3rem; color: #8C5E2A; }
+        .page-header p { margin: 10px 0 0; color: #666; font-size: 1.1rem; }
+        .dashboard-wrapper {
+            display: grid; grid-template-columns: 320px 1fr; gap: 40px;
+            max-width: 1200px; width: 100%; margin: 0 auto; padding: 20px 20px 40px;
+            box-sizing: border-box; align-items: start;
+        }
+        .profile-sidebar {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #eee;
+            text-align: center;
+            position: sticky; top: 90px;
+        }
+        .avatar-img {
+            width: 150px; height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #f8f7f0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .user-badge-lg h2 {
+            font-family: 'Playfair Display', serif; font-size: 1.6rem; color: #8C5E2A;
+            margin: 10px 0 5px;
+        }
+        .user-badge-lg p { color: #666; font-size: 0.95rem; margin: 0; }
+        .status-pill {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 6px 16px;
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .content-panel {
+            background: #ffffff;
+            padding: 30px 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            border: 1px solid #eee;
+        }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .panel-header h3 { margin: 0; font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #333; }
+        .info-grid { display: grid; gap: 20px; }
+        .info-row { display: flex; flex-direction: column; border-bottom: 1px solid #f9f9f9; padding-bottom: 12px; }
+        .info-label { font-size: 0.8rem; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+        .info-value { font-size: 1.05rem; color: #333; font-weight: 500; }
+        .btn-secondary { 
+            background-color: transparent; 
+            border: 1px solid #8C5E2A; 
+            color: #8C5E2A; 
+            padding: 8px 15px; 
+            font-weight: 600; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            transition: all 0.3s; 
+        }
+        .btn-secondary:hover { background-color: #fcf4e8; }
+        .footer { background-color: #8C5E2A; color: #fff; padding: 0.5rem 1rem; text-align: left; margin-top: auto; }
+        .footer-content { display: flex; flex-direction: column; align-items: center; }
+        .footer p { margin: 0.2rem 0; font-size: 0.85rem; line-height: 1.4; }
+        .siguenos-redes { display: flex; align-items: center; gap: 2rem; margin-top: 0.5rem; }
+        .instagram-icon { height: 30px; }
+        @media (max-width: 800px) {
+            .navbar { height: auto; flex-direction: column; padding: 15px; gap: 10px; }
+            .dashboard-wrapper { grid-template-columns: 1fr; gap: 30px; }
+            .profile-sidebar { position: static; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logotipo">
+            <span>Fauna y Flora Local Qro</span>
+        </div>
+        <div class="links">
+            <a href="/mapa2">Mapa</a>
+            <a href="/comentarios">Comentarios</a>
+            <a href="/consejos">Consejos</a>
+            <a href="/inicio_usuario">Volver</a>
+            <a href="{{ url_for('logout') }}" style="color: #8C5E2A; font-weight: bold;">Cerrar sesión</a>
+        </div>
+    </nav>
+
+    <header class="page-header">
+        <h1>Mi Perfil</h1>
+        <p>Gestiona tu información personal y cuenta</p>
+    </header>
+
+    <div class="dashboard-wrapper">
+        <aside class="profile-sidebar">
+            <div class="avatar-container">
+                <img src="{{ url_for('static', filename='imgperfil/' + (usuario.profile_image or 'default.png')) }}" alt="Mi Foto" class="avatar-img">
+            </div>
+            <div class="user-badge-lg">
+                <span class="status-pill">Miembro de la Comunidad <i class="fas fa-leaf"></i></span>
+            </div>
+        </aside>
+
+        <section class="content-panel">
+            <div class="panel-header">
+                <h3>Información Personal</h3>
+                <button class="btn btn-secondary">
+                    <i class="fas fa-pen"></i> Editar Datos
+                </button>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-row">
+                    <span class="info-label">Nombre Completo</span>
+                    <span class="info-value">Karla Martinez Rauda</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Correo Electrónico</span>
+                    <span class="info-value">karla@gmail.com</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Rol</span>
+                    <span class="info-value">Usuario Registrado</span>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 Flora y Fauna de Querétaro. Todos los derechos reservados.</p>
+            <div class="siguenos-redes">
+                <p class="siguenos" style="margin:0;">Síguenos:</p>
+                <a href="https://www.instagram.com/bio_qro25?igsh=MTdoN2FlZTd1ZnE5bw==" target="_blank">
+                    <img src="{{ url_for('static', filename='img/instagram.png') }}" alt="Instagram" class="instagram-icon">
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => { console.log("Página cargada y lista"); });
+    </script>
+    
+</body>
+</html>
