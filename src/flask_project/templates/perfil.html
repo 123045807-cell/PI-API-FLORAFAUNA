@@ -166,15 +166,15 @@
             <div class="info-grid">
                 <div class="info-row">
                     <span class="info-label">Nombre Completo</span>
-                    <span class="info-value">Karla Martinez Rauda</span>
+                    <span class="info-value">{{ usuario.full_name }}</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Correo Electrónico</span>
-                    <span class="info-value">karla@gmail.com</span>
+                    <span class="info-value">{{ usuario.email }}</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Rol</span>
-                    <span class="info-value">Usuario Registrado</span>
+                    <span class="info-value">{{ usuario.rol_text }}</span>
                 </div>
             </div>
         </section>

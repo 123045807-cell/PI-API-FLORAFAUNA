@@ -1,6 +1,7 @@
 from flask import Flask, render_template, session, redirect, url_for, request, flash
 from config import Config
 import api_client as api
+import unicodedata
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -25,6 +26,141 @@ ZONAS = {
     17: "Huimilpan",
     18: "Amealco de Bonfil",
 }
+
+
+def normalize_text(text):
+    if not text:
+        return ""
+    normalized = unicodedata.normalize("NFKD", text)
+    normalized = "".join(ch for ch in normalized if not unicodedata.combining(ch))
+    return normalized.lower().strip()
+
+CONSEJO_IMAGENES = {
+    normalize_text("Protección del Mirlo café"): "mirlo.jpg",
+    normalize_text("Cuidado del Chamal"): "chamal.jpg",
+    normalize_text("Control de residuos"): "residuos.jpg",
+    normalize_text("Senderos responsables"): "senderos.jpg",
+    normalize_text("Respeto a la fauna"): "fauna.jpg",
+    normalize_text("Protección de la Tangara Azulgrís"): "tangara.jpg",
+    normalize_text("Cuidado del Mirto coral"): "mirto.jpg",
+    normalize_text("Arañas benéficas"): "arana.jpg",
+    normalize_text("Reforestación responsable"): "reforestacion.jpg",
+    normalize_text("Guacamayas verdes"): "guacamaya.jpg",
+    normalize_text("Hormigas chicatanas"): "hormiga.jpg",
+    normalize_text("Alacrancillo medicinal"): "alacrancillo.jpg",
+    normalize_text("Control de incendios"): "incendios.jpg",
+    normalize_text("Protección de ranas"): "rana.jpg",
+    normalize_text("Mariposas en peligro"): "mariposa.jpg",
+    normalize_text("Álamos blancos"): "alamo.jpg",
+    normalize_text("Turismo responsable"): "turismo.jpg",
+    normalize_text("Chara pecho gris"): "chara.jpg",
+    normalize_text("Carpinteros belloteros"): "carpintero.jpg",
+    normalize_text("Mirto chico"): "mirtochico.jpg",
+    normalize_text("Senderismo responsable"): "senderismo.jpg",
+    normalize_text("Peyote protegido"): "peyote.jpg",
+    normalize_text("Aves insectívoras"): "aves.jpg",
+    normalize_text("Zopilotes benéficos"): "zopilote.jpg",
+    normalize_text("Conservación de suelos"): "suelos.jpg",
+    normalize_text("Garambullo comestible"): "garambullo.jpg",
+    normalize_text("Colibríes en peligro"): "colibri.jpg",
+    normalize_text("Carpinteros cheje"): "cheje.jpg",
+    normalize_text("Cactáceas nativas"): "cactaceas.jpg",
+    normalize_text("Biznagas endémicas"): "biznagas.jpg",
+    normalize_text("Reptiles protegidos"): "reptiles.jpg",
+    normalize_text("Turismo ecológico"): "ecoturismo.jpg",
+    normalize_text("Manzanilla de llano"): "manzanilla.jpg",
+    normalize_text("Gallito de monte"): "gallito.jpg",
+    normalize_text("Control de especies invasoras"): "invasoras.jpg",
+    normalize_text("Consumo responsable"): "consumo.jpg",
+    normalize_text("Kalanchoe ornamental"): "kalanchoe.jpg",
+    normalize_text("Biznaga de acitrón"): "acitron.jpeg",
+    normalize_text("Chapulín arcoíris"): "chapulin.jpg",
+    normalize_text("Mariposa Monarca"): "monarca.jpg",
+    normalize_text("Biznaga ganchuda"): "ganchuda.jpg",
+    normalize_text("Centzontle norteño"): "centzontle.jpg",
+    normalize_text("Conservación de humedales"): "humedales.jpg",
+    normalize_text("Agricultura sostenible"): "agricultura.jpg",
+    normalize_text("Jardines polinizadores"): "polinizadores.jpg",
+    normalize_text("Árboles nativos"): "arboles.jpg",
+    normalize_text("Control de plagas natural"): "plagas.jpg",
+    normalize_text("Setos vivos"): "setos.jpg",
+    normalize_text("Agua de lluvia"): "lluvia.png",
+    normalize_text("Biodiversidad agrícola"): "biodiversidad.jpg",
+    normalize_text("Corredores biológicos"): "corredores.jpeg",
+    normalize_text("Techos verdes"): "techos.jpg",
+    normalize_text("Humedales artificiales"): "humedales_artificiales.jpg",
+    normalize_text("Control biológico"): "biologico.jpg",
+    normalize_text("Educación ambiental"): "educacion.jpg",
+    normalize_text("Jardines urbanos"): "jardines.jpg",
+    normalize_text("Aves urbanas"): "avesurbanas.jpg",
+    normalize_text("Movilidad sostenible"): "movilidad.jpeg",
+    normalize_text("Árboles urbanos"): "arbolesurbanos.jpg",
+    normalize_text("Reciclaje comunitario"): "reciclaje.jpg",
+    normalize_text("Corredores verdes"): "corredoresverdes.jpg",
+    normalize_text("Reforestación urbana"): "reforestacionurbana.jpeg",
+    normalize_text("Conservación de cerros"): "cerros.jpeg",
+    normalize_text("Agricultura periurbana"): "periurbana.jpg",
+    normalize_text("Flor de gallito"): "florgallito.jpg",
+    normalize_text("Zafiro orejas blancas"): "zafiro.jpg",
+    normalize_text("Capulinero gris"): "capulinero.jpg",
+    normalize_text("Ranita de cañón"): "ranita.jpg",
+    normalize_text("Carpintero bellotero"): "carpintero.jpg",
+    normalize_text("Camaleón de montaña"): "camaleon.jpg",
+    normalize_text("Junco ojos de lumbre"): "junco.jpg",
+    normalize_text("Pingüica"): "pinguica.jpg",
+}
+
+
+def obtener_imagen_consejo(titulo):
+    clave = normalize_text(titulo)
+    if clave in CONSEJO_IMAGENES:
+        return f"imgconsejos/{CONSEJO_IMAGENES[clave]}"
+    for texto, nombre_archivo in CONSEJO_IMAGENES.items():
+        if texto in clave:
+            return f"imgconsejos/{nombre_archivo}"
+    return "imgconsejos/educacion.jpg"
+
+
+def get_field(data, keys, default=""):
+    for key in keys:
+        if key in data and data[key] not in (None, ""):
+            return data[key]
+    return default
+
+
+def normalizar_consejo(consejo):
+    if not isinstance(consejo, dict):
+        return consejo
+
+    titulo = get_field(consejo, ["titulo", "Titulo", "Titulo_consejo", "titulo_consejo"])
+    if titulo:
+        consejo["titulo"] = titulo
+
+    consejo["imagen"] = obtener_imagen_consejo(titulo)
+
+    zona_valor = get_field(consejo, ["zona", "Zona", "ID_zona", "id_zona"])
+    if isinstance(zona_valor, int):
+        consejo["zona"] = ZONAS.get(zona_valor, zona_valor)
+    else:
+        try:
+            zona_int = int(zona_valor)
+            consejo["zona"] = ZONAS.get(zona_int, zona_valor)
+        except Exception:
+            consejo["zona"] = zona_valor
+
+    texto = get_field(consejo, ["consejo", "Consejo", "contenido", "Contenido", "texto", "Texto"])
+    if texto:
+        consejo["consejo"] = texto
+
+    fecha = get_field(consejo, ["fecha", "Fecha", "Fecha_publicacion", "fecha_publicacion"])
+    if fecha:
+        consejo["fecha"] = fecha
+
+    hora = get_field(consejo, ["hora", "Hora", "Hora_publicacion", "hora_publicacion"])
+    if hora:
+        consejo["hora"] = hora
+
+    return consejo
 
 
 # ── Páginas generales ─────────────────────────────────────────
@@ -108,7 +244,41 @@ def logout():
 
 @app.route("/perfil")
 def perfil():
-    usuario = session.get("usuario", {})
+    usuario = session.get("usuario")
+    if not usuario:
+        return redirect(url_for("login"))
+
+    if isinstance(usuario, dict):
+        usuario_id = get_field(usuario, ["id", "ID", "ID_usuario", "id_usuario"])
+        if usuario_id:
+            try:
+                usuario_id = int(usuario_id)
+                usuario_api = api.get_usuario(usuario_id)
+                if isinstance(usuario_api, dict):
+                    usuario.update(usuario_api)
+                    session["usuario"] = usuario
+            except Exception:
+                pass
+
+        nombre = get_field(usuario, ["nombre", "Nombre", "first_name", "firstName"])
+        apellido_paterno = get_field(usuario, ["apellidoPaterno", "apellido_paterno", "ApellidoPaterno"])
+        apellido_materno = get_field(usuario, ["apellidoMaterno", "apellido_materno", "ApellidoMaterno"])
+        correo = get_field(usuario, ["correo", "Correo", "email", "Email"])
+        rol = get_field(usuario, ["rol", "Rol", "role", "Role"], "Usuario Registrado")
+
+        nombre_completo = " ".join([p for p in [nombre, apellido_paterno, apellido_materno] if p]).strip()
+        usuario["full_name"] = nombre_completo or correo or "Usuario"
+        usuario["email"] = correo or usuario.get("email", "")
+        usuario["rol_text"] = rol
+        usuario["profile_image"] = usuario.get("profile_image") or usuario.get("imagen") or "default.png"
+    else:
+        usuario = {
+            "full_name": "Usuario",
+            "email": "",
+            "rol_text": "Usuario Registrado",
+            "profile_image": "default.png",
+        }
+
     return render_template("perfil.html", usuario=usuario)
 
 
@@ -126,7 +296,9 @@ def mapa2():
 
 @app.route("/consejos")
 def consejos():
-    consejos = api.get_consejos()
+    consejos = api.get_consejos() or []
+    for consejo in consejos:
+        normalizar_consejo(consejo)
     return render_template("consejos.html", consejos=consejos)
 
 
@@ -196,7 +368,9 @@ def zona(id_zona):
 
     nombre_zona = ZONAS[id_zona]
     especies    = api.get_especies_por_zona(id_zona)
-    consejos    = api.get_consejos_por_zona(id_zona)
+    consejos    = api.get_consejos_por_zona(id_zona) or []
+    for consejo in consejos:
+        normalizar_consejo(consejo)
 
     return render_template(
         "zona.html",

@@ -1,26 +1,34 @@
+import os
 import requests
 
-API_URL = "http://api:8000"
+API_URL = os.getenv("API_URL", "http://api:8000").rstrip("/")
+API_URL_FALLBACKS = [API_URL, "http://localhost:8000"]
 HEADERS_USER  = {"x-api-key": "USER123"}
 HEADERS_ADMIN = {"x-api-key": "MASTER999"}
 
 
+def _request(method, endpoint, json=None, headers=HEADERS_USER):
+    for base_url in API_URL_FALLBACKS:
+        try:
+            url = f"{base_url}{endpoint}"
+            response = requests.request(method, url, json=json, headers=headers, timeout=5)
+            response.raise_for_status()
+            return response.json()
+        except Exception:
+            continue
+    return None
+
+
 def _get(endpoint, headers=HEADERS_USER):
-    try:
-        r = requests.get(f"{API_URL}{endpoint}", headers=headers, timeout=5)
-        r.raise_for_status()
-        return r.json()
-    except Exception:
-        return None
+    return _request("GET", endpoint, headers=headers)
 
 
 def _post(endpoint, data, headers=HEADERS_USER):
-    try:
-        r = requests.post(f"{API_URL}{endpoint}", json=data, headers=headers, timeout=5)
-        r.raise_for_status()
-        return r.json()
-    except Exception:
-        return None
+    return _request("POST", endpoint, json=data, headers=headers)
+
+
+def _delete(endpoint, headers=HEADERS_USER):
+    return _request("DELETE", endpoint, headers=headers)
 
 
 # ── Especies ──────────────────────────────────────────────────
@@ -65,11 +73,8 @@ def editar_comentario(id, contenido):
     return _post(f"/comentarios/editar/{id}", {"contenido": contenido})
 
 def eliminar_comentario(id):
-    try:
-        r = requests.delete(f"{API_URL}/comentarios/{id}", headers=HEADERS_USER, timeout=5)
-        return r.status_code == 200
-    except Exception:
-        return False
+    resultado = _delete(f"/comentarios/{id}")
+    return resultado is not None
 
 # ── Usuarios ──────────────────────────────────────────────────
 def get_usuario(id):
