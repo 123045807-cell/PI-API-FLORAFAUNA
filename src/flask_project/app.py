@@ -27,6 +27,27 @@ ZONAS = {
     18: "Amealco de Bonfil",
 }
 
+IMAGENES_ZONAS = {
+    1: "jalpan.jpg",
+    2: "landa.jpg",
+    3: None,
+    4: "pinal.jpg",
+    5: "sanjoaquin.jpg",
+    6: "penamiller.jpg",
+    7: "cadereyta.png",
+    8: None,
+    9: None,
+    10: None,
+    11: None,
+    12: None,
+    13: None,
+    14: None,
+    15: None,
+    16: None,
+    17: None,
+    18: "amealco.jpg",
+}
+
 
 def normalize_text(text):
     if not text:
@@ -367,6 +388,7 @@ def zona(id_zona):
         return redirect(url_for("inicio"))
 
     nombre_zona = ZONAS[id_zona]
+    imagen_zona = IMAGENES_ZONAS.get(id_zona)
     especies    = api.get_especies_por_zona(id_zona)
     consejos    = api.get_consejos_por_zona(id_zona) or []
     for consejo in consejos:
@@ -376,8 +398,10 @@ def zona(id_zona):
         "zona.html",
         id_zona=id_zona,
         nombre_zona=nombre_zona,
+        imagen_zona=imagen_zona,
         especies=especies,
         consejos=consejos,
+        
     )
 
 

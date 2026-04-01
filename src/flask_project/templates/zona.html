@@ -47,7 +47,7 @@
     }
     .hero-internal {
       height: 50vh;
-      background-image: url("{{ url_for('static', filename='img/hero-zona' ~ id_zona ~ '.jpg') }}");
+      background-image: url("{{ url_for('static', filename='imagenes_zonas/' ~ imagen_zona) if imagen_zona else '' }}");
       background-size: cover;
       background-position: center;
       display: flex;
@@ -138,14 +138,26 @@
       {% for especie in especies %}
       <div class="col">
         <div class="card-custom">
-          <div class="image-placeholder">
-            <i class="fa-solid fa-camera fa-3x"></i>
-          </div>
+
+          {% if especie.url_imagen %}
+            <img src="{{ especie.url_imagen }}"
+                 alt="{{ especie.Nombre_comun }}"
+                 style="width:100%; height:200px; object-fit:cover;"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="image-placeholder" style="display:none;">
+              <i class="fa-solid fa-camera fa-3x"></i>
+            </div>
+          {% else %}
+            <div class="image-placeholder">
+              <i class="fa-solid fa-camera fa-3x"></i>
+            </div>
+          {% endif %}
+
           <div class="card-body-custom">
             <h3>{{ especie.Nombre_comun }}</h3>
             <div style="font-size: 0.9rem; color: #555; line-height: 1.6;">
               <p class="mb-1"><strong>Científico:</strong> <em>{{ especie.nombre_cientifico }}</em></p>
-              <p class="mb-1"><strong>Familia:</strong> {{ especie.familia }}</p> 
+              <p class="mb-1"><strong>Familia:</strong> {{ especie.familia }}</p>
 
               {% set estado_id = especie.id_estado_conservacion %}
               {% if estado_id == 1 %}
@@ -174,6 +186,7 @@
               <p class="mb-0"><strong>Zona:</strong> {{ nombre_zona }}</p>
             </div>
           </div>
+
         </div>
       </div>
       {% endfor %}
