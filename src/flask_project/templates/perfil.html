@@ -102,7 +102,7 @@
             background-color: transparent; 
             border: 1px solid #8C5E2A; 
             color: #8C5E2A; 
-            padding: 8px 15px; 
+            padding: 10px 18px; 
             font-weight: 600; 
             border-radius: 6px; 
             cursor: pointer; 
@@ -112,6 +112,31 @@
             transition: all 0.3s; 
         }
         .btn-secondary:hover { background-color: #fcf4e8; }
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 18px;
+        }
+        .form-field label {
+            font-size: 0.85rem;
+            color: #777;
+            font-weight: 600;
+        }
+        .form-field input {
+            padding: 12px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #333;
+            background: #fafafa;
+        }
+        .form-field input:focus {
+            outline: none;
+            border-color: #8C5E2A;
+            box-shadow: 0 0 0 3px rgba(140,94,42,0.1);
+        }
+        .btn-secondary + .btn-secondary { margin-left: 10px; }
         .footer { background-color: #8C5E2A; color: #fff; padding: 0.5rem 1rem; text-align: left; margin-top: auto; }
         .footer-content { display: flex; flex-direction: column; align-items: center; }
         .footer p { margin: 0.2rem 0; font-size: 0.85rem; line-height: 1.4; }
@@ -144,6 +169,17 @@
         <h1>Mi Perfil</h1>
         <p>Gestiona tu información personal y cuenta</p>
     </header>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div style="max-width:1200px;margin:0 auto 20px;padding:0 20px;">
+          {% for category, message in messages %}
+            <div style="padding:12px 18px;margin-bottom:10px;border-radius:8px; background: #e8f5e9; color: #256029; border: 1px solid #c8e6c9;">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
 
     <div class="dashboard-wrapper">
         <aside class="profile-sidebar">
@@ -156,27 +192,42 @@
         </aside>
 
         <section class="content-panel">
-            <div class="panel-header">
-                <h3>Información Personal</h3>
-                <button class="btn btn-secondary">
-                    <i class="fas fa-pen"></i> Editar Datos
-                </button>
-            </div>
+            <form method="post" action="{{ url_for('perfil') }}">
+                <div class="panel-header">
+                    <h3>Información Personal</h3>
+                    <div>
+                        <button id="edit-button" type="button" class="btn btn-secondary">
+                            <i class="fas fa-pen"></i> Editar datos
+                        </button>
+                        <button id="save-button" type="submit" class="btn btn-secondary" style="display:none;">
+                            <i class="fas fa-save"></i> Guardar cambios
+                        </button>
+                    </div>
+                </div>
 
-            <div class="info-grid">
-                <div class="info-row">
-                    <span class="info-label">Nombre Completo</span>
-                    <span class="info-value">{{ usuario.full_name }}</span>
+                <div class="info-grid">
+                    <div class="info-row form-field">
+                        <label for="nombre">Nombre</label>
+                        <input id="nombre" name="nombre" type="text" value="{{ usuario.nombre }}" placeholder="Nombre" disabled>
+                    </div>
+                    <div class="info-row form-field">
+                        <label for="apellido_paterno">Apellido Paterno</label>
+                        <input id="apellido_paterno" name="apellido_paterno" type="text" value="{{ usuario.apellidoPaterno }}" placeholder="Apellido Paterno" disabled>
+                    </div>
+                    <div class="info-row form-field">
+                        <label for="apellido_materno">Apellido Materno</label>
+                        <input id="apellido_materno" name="apellido_materno" type="text" value="{{ usuario.apellidoMaterno }}" placeholder="Apellido Materno" disabled>
+                    </div>
+                    <div class="info-row form-field">
+                        <label for="correo">Correo Electrónico</label>
+                        <input id="correo" name="correo" type="email" value="{{ usuario.correo }}" placeholder="Correo Electrónico" disabled>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Rol</span>
+                        <span class="info-value">{{ usuario.rol_text }}</span>
+                    </div>
                 </div>
-                <div class="info-row">
-                    <span class="info-label">Correo Electrónico</span>
-                    <span class="info-value">{{ usuario.email }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Rol</span>
-                    <span class="info-value">{{ usuario.rol_text }}</span>
-                </div>
-            </div>
+            </form>
         </section>
     </div>
 
@@ -193,7 +244,17 @@
     </footer>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => { console.log("Página cargada y lista"); });
+        document.addEventListener("DOMContentLoaded", () => {
+            const editBtn = document.getElementById('edit-button');
+            const saveBtn = document.getElementById('save-button');
+            const inputs = document.querySelectorAll('.form-field input');
+
+            editBtn?.addEventListener('click', () => {
+                inputs.forEach(input => input.removeAttribute('disabled'));
+                editBtn.style.display = 'none';
+                saveBtn.style.display = 'inline-flex';
+            });
+        });
     </script>
     
 </body>

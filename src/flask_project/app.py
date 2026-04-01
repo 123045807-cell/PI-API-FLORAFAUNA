@@ -263,24 +263,22 @@ def logout():
 
 # ── Perfil ────────────────────────────────────────────────────
 
-@app.route("/perfil")
+@app.route("/perfil", methods=["GET", "POST"])
 def perfil():
     usuario = session.get("usuario")
     if not usuario:
         return redirect(url_for("login"))
 
-    if isinstance(usuario, dict):
-        usuario_id = get_field(usuario, ["id", "ID", "ID_usuario", "id_usuario"])
-        if usuario_id:
-            try:
-                usuario_id = int(usuario_id)
-                usuario_api = api.get_usuario(usuario_id)
-                if isinstance(usuario_api, dict):
-                    usuario.update(usuario_api)
-                    session["usuario"] = usuario
-            except Exception:
-                pass
+    if request.method == "POST" and isinstance(usuario, dict):
+        usuario["nombre"] = request.form.get("nombre", usuario.get("nombre", "")).strip()
+        usuario["apellidoPaterno"] = request.form.get("apellido_paterno", usuario.get("apellidoPaterno", "")).strip()
+        usuario["apellidoMaterno"] = request.form.get("apellido_materno", usuario.get("apellidoMaterno", "")).strip()
+        usuario["correo"] = request.form.get("correo", usuario.get("correo", usuario.get("email", ""))).strip()
+        session["usuario"] = usuario
+        flash("Perfil actualizado correctamente.", "success")
+        return redirect(url_for("perfil"))
 
+    if isinstance(usuario, dict):
         nombre = get_field(usuario, ["nombre", "Nombre", "first_name", "firstName"])
         apellido_paterno = get_field(usuario, ["apellidoPaterno", "apellido_paterno", "ApellidoPaterno"])
         apellido_materno = get_field(usuario, ["apellidoMaterno", "apellido_materno", "ApellidoMaterno"])
@@ -292,12 +290,20 @@ def perfil():
         usuario["email"] = correo or usuario.get("email", "")
         usuario["rol_text"] = rol
         usuario["profile_image"] = usuario.get("profile_image") or usuario.get("imagen") or "default.png"
+        usuario["nombre"] = nombre
+        usuario["apellidoPaterno"] = apellido_paterno
+        usuario["apellidoMaterno"] = apellido_materno
+        usuario["correo"] = correo
     else:
         usuario = {
             "full_name": "Usuario",
             "email": "",
             "rol_text": "Usuario Registrado",
             "profile_image": "default.png",
+            "nombre": "",
+            "apellidoPaterno": "",
+            "apellidoMaterno": "",
+            "correo": "",
         }
 
     return render_template("perfil.html", usuario=usuario)
