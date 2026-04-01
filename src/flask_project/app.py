@@ -61,16 +61,23 @@ def inicio_usuario():
     flora       = sum(1 for e in especies if e.get("tipo") == 1)
     fauna       = sum(1 for e in especies if e.get("tipo") == 2)
     vulnerables = sum(1 for e in especies if e.get("id_estado_conservacion") in (3, 4, 5))
-    zonas       = len(ZONAS)
 
-    stats = {"flora": flora, "fauna": fauna, "zonas": zonas, "vulnerables": vulnerables}
+    stats = {"flora": flora, "fauna": fauna, "zonas": len(ZONAS), "vulnerables": vulnerables}
 
     todas_las_fotos = [e for e in especies if e.get("url_imagen")]
-    fotografiadas   = len(todas_las_fotos)
-    pendientes      = len(especies) - fotografiadas
-    fotos = {"fotografiadas": fotografiadas, "pendientes": pendientes}
+    fotos = {"fotografiadas": len(todas_las_fotos), "pendientes": len(especies) - len(todas_las_fotos)}
 
-    return render_template("inicio_usuario.html", stats=stats, fotos=fotos)
+    zonas_carrusel = [
+        {"nombre": "Jalpan de Serra",     "ruta": "imagenes_zonas/jalpan.jpg"},
+        {"nombre": "Peñamiller",          "ruta": "imagenes_zonas/penamiller.jpg"},
+        {"nombre": "Pinal de Amoles",     "ruta": "imagenes_zonas/pinal.jpg"},
+        {"nombre": "Cadereyta de Montes", "ruta": "imagenes_zonas/cadereyta.png"},
+        {"nombre": "Landa de Matamoros",  "ruta": "imagenes_zonas/landa.jpg"},
+        {"nombre": "San Joaquín",         "ruta": "imagenes_zonas/sanjoaquin.jpg"},
+        {"nombre": "Amealco de Bonfil",   "ruta": "imagenes_zonas/amealco.jpg"},
+    ]
+
+    return render_template("inicio_usuario.html", stats=stats, fotos=fotos, zonas=zonas_carrusel)
 
 
 # ── Auth ──────────────────────────────────────────────────────
