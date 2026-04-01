@@ -8,7 +8,6 @@ router = APIRouter(prefix="/fichas", tags=["Fichas"])
 
 
 # ─── Especies ────────────────────────────────────────────────
-
 @router.get("/especies")
 def obtener_especies(db=Depends(get_db), user=Depends(require_api_key)):
     cursor = db.cursor()
@@ -20,9 +19,11 @@ def obtener_especies(db=Depends(get_db), user=Depends(require_api_key)):
             e.tipo,
             f.nombre_familia AS familia,
             e.id_zonas,
-            e.id_estado_conservacion
+            e.id_estado_conservacion,
+            fo.url_imagen
         FROM Especies e
         LEFT JOIN Familia f ON e.id_familia = f.ID
+        LEFT JOIN Fotografia fo ON fo.id_especie = e.ID
     """)
     return cursor.fetchall()
 
@@ -38,9 +39,11 @@ def obtener_especie(id: int, db=Depends(get_db), user=Depends(require_api_key)):
             e.tipo,
             f.nombre_familia AS familia,
             e.id_zonas,
-            e.id_estado_conservacion
+            e.id_estado_conservacion,
+            fo.url_imagen
         FROM Especies e
         LEFT JOIN Familia f ON e.id_familia = f.ID
+        LEFT JOIN Fotografia fo ON fo.id_especie = e.ID
         WHERE e.ID = %s
     """, (id,))
     especie = cursor.fetchone()
@@ -60,9 +63,11 @@ def especies_por_zona(id_zona: int, db=Depends(get_db), user=Depends(require_api
             e.tipo,
             f.nombre_familia AS familia,
             e.id_zonas,
-            e.id_estado_conservacion
+            e.id_estado_conservacion,
+            fo.url_imagen
         FROM Especies e
         LEFT JOIN Familia f ON e.id_familia = f.ID
+        LEFT JOIN Fotografia fo ON fo.id_especie = e.ID
         WHERE e.id_zonas = %s
     """, (id_zona,))
     return cursor.fetchall()
