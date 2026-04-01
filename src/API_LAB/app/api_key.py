@@ -3,14 +3,11 @@ from fastapi import Header, HTTPException
 from dotenv import load_dotenv
 
 load_dotenv()
-
-# Cargar API_KEYS desde .env
 api_keys_env = os.getenv("API_KEYS")
 
 if not api_keys_env:
     raise ValueError("No se encontró API_KEYS en el archivo .env")
 
-# admin:MASTER999,usuario:USER123
 API_KEYS = dict(item.split(":") for item in api_keys_env.split(","))
 
 

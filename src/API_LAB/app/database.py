@@ -15,7 +15,6 @@ def db_connect():
         autocommit=True,
     )
 
-# Dependencia para FastAPI
 def get_db():
     db = db_connect()
     try:
