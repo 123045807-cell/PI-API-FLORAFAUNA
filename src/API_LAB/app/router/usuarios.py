@@ -100,7 +100,6 @@ def eliminar_usuario(id: int, db=Depends(get_db), user=Depends(require_api_key))
     if not cursor.fetchone():
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     
-    # Borrar dependencias primero
     cursor.execute("DELETE FROM Comentario WHERE ID_usuario=%s", (id,))
     cursor.execute("DELETE FROM Likes WHERE ID_usuario=%s", (id,))
     

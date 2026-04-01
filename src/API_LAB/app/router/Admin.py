@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
-
 from app.database import get_db
 from app.api_key import require_admin
-
 from app.model.Usuario import UsuarioAct
 from app.model.especies import Especie as EspecieSchema, EspecieActualizar
 from app.model.fotografia import Fotografia
@@ -13,9 +11,6 @@ router = APIRouter(
     tags=["Admin"]
 )
 
-# =========================
-# ADMIN USUARIOS
-# =========================
 @router.get("/usuarios")
 def obtener_usuarios(db=Depends(get_db), admin=Depends(require_admin)):
     cursor = db.cursor()
@@ -66,9 +61,6 @@ def eliminar_usuario(id: int, db=Depends(get_db), admin=Depends(require_admin)):
 
     return {"success": True, "mensaje": "Usuario eliminado"}
 
-# =========================
-# ADMIN ESPECIES
-# =========================
 
 @router.post("/especies")
 def crear_especie(
@@ -145,10 +137,6 @@ def eliminar_especie(
     return {"mensaje": "Especie eliminada"}
 
 
-# =========================
-# ADMIN FOTOGRAFIAS
-# =========================
-
 @router.post("/fotografias")
 def agregar_foto(
     datos: Fotografia,
@@ -179,10 +167,6 @@ def eliminar_foto(
     cursor.execute("DELETE FROM Fotografia WHERE id_foto=%s", (id,))
     return {"mensaje": "Foto eliminada"}
 
-
-# =========================
-# ADMIN COMENTARIOS
-# =========================
 
 @router.get("/comentarios")
 def obtener_comentarios(

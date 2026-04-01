@@ -7,7 +7,6 @@ from app.model.fotografia import Fotografia
 router = APIRouter(prefix="/fichas", tags=["Fichas"])
 
 
-# ─── Especies ────────────────────────────────────────────────
 @router.get("/especies")
 def obtener_especies(db=Depends(get_db), user=Depends(require_api_key)):
     cursor = db.cursor()
@@ -126,8 +125,6 @@ def eliminar_especie(id: int, db=Depends(get_db), admin=Depends(require_admin)):
     cursor.execute("DELETE FROM Especies WHERE ID = %s", (id,))
     return {"mensaje": "Especie eliminada correctamente"}
 
-
-# ─── Fotografías ─────────────────────────────────────────────
 
 @router.get("/fotografias/{id_especie}")
 def obtener_fotos(id_especie: int, db=Depends(get_db), user=Depends(require_api_key)):
