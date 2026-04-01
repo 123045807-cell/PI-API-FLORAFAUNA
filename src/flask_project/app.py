@@ -28,6 +28,8 @@ ZONAS = {
     18: "Amealco de Bonfil",
 }
 
+
+
 IMAGENES_ZONAS = {
     1: "jalpan.jpg",
     2: "landa.jpg",
