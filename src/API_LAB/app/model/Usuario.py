@@ -10,11 +10,12 @@ class Usuario(BaseModel):
 
 
 class UsuarioAct(BaseModel):
-    nombre: Optional[str] = Field(None, min_length=2, max_length=100)
-    apellidoPaterno: Optional[str] = Field(None, min_length=2, max_length=100)
-    apellidoMaterno: Optional[str] = Field(None, max_length=100)
-    correo: Optional[EmailStr]
-    contrasena: Optional[str] = Field(None, min_length=6, max_length=255)
+    nombre:          Optional[str]      = Field(None, min_length=2, max_length=100)
+    apellidoPaterno: Optional[str]      = Field(None, min_length=2, max_length=100)
+    apellidoMaterno: Optional[str]      = Field(None, max_length=100)
+    correo:          Optional[EmailStr] = None
+    contrasena:      Optional[str]      = Field(None, min_length=6, max_length=255)
+    rol:             Optional[str]      = None          # "usuario" | "admin"
 
 class UsuarioLogin(BaseModel):
     correo: str

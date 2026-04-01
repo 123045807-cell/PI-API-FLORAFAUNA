@@ -16,58 +16,55 @@ router = APIRouter(
 # =========================
 # ADMIN USUARIOS
 # =========================
-
 @router.get("/usuarios")
-def obtener_usuarios(
-    db = Depends(get_db),
-    admin = Depends(require_admin)
-):
+def obtener_usuarios(db=Depends(get_db), admin=Depends(require_admin)):
     cursor = db.cursor()
-    cursor.execute("SELECT * FROM Usuarios")
-    usuarios = cursor.fetchall()
-    return usuarios
+    cursor.execute("SELECT id, nombre, apellidoPaterno, apellidoMaterno, correo, rol FROM Usuarios")
+    return cursor.fetchall()
 
 
 @router.put("/usuarios/{id}")
-def actualizar_usuario(
-    id: int,
-    datos: UsuarioAct,
-    db = Depends(get_db),
-    admin = Depends(require_admin)
-):
+def actualizar_usuario(id: int, datos: UsuarioAct, db=Depends(get_db), admin=Depends(require_admin)):
     cursor = db.cursor()
-    cursor.execute("SELECT * FROM Usuarios WHERE id_usuario = %s", (id,))
+    cursor.execute("SELECT * FROM Usuarios WHERE id = %s", (id,))
     usuario = cursor.fetchone()
-
     if not usuario:
-        raise HTTPException(404, "Usuario no encontrado")
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-    if datos.nombre:
-        cursor.execute("UPDATE Usuarios SET nombre=%s WHERE id_usuario=%s", (datos.nombre, id))
-    if datos.correo:
-        cursor.execute("UPDATE Usuarios SET correo=%s WHERE id_usuario=%s", (datos.correo, id))
-    if datos.contrasena:
-        cursor.execute("UPDATE Usuarios SET contrasena=%s WHERE id_usuario=%s", (datos.contrasena, id))
+    campos = {
+        "nombre":          datos.nombre,
+        "apellidoPaterno": datos.apellidoPaterno,
+        "apellidoMaterno": datos.apellidoMaterno,
+        "correo":          datos.correo,
+        "contrasena":      datos.contrasena,
+        "rol":             datos.rol,
+    }
 
-    return {"mensaje": "Usuario actualizado"}
+    for columna, valor in campos.items():
+        if valor is not None:
+            cursor.execute(
+                f"UPDATE Usuarios SET {columna} = %s WHERE id = %s",
+                (valor, id)
+            )
+
+    db.commit()
+    return {"success": True, "mensaje": "Usuario actualizado"}
 
 
 @router.delete("/usuarios/{id}")
-def eliminar_usuario(
-    id: int,
-    db = Depends(get_db),
-    admin = Depends(require_admin)
-):
+def eliminar_usuario(id: int, db=Depends(get_db), admin=Depends(require_admin)):
     cursor = db.cursor()
-    cursor.execute("SELECT * FROM Usuarios WHERE id_usuario=%s", (id,))
+    cursor.execute("SELECT * FROM Usuarios WHERE id = %s", (id,))
     usuario = cursor.fetchone()
-
     if not usuario:
-        raise HTTPException(404, "Usuario no encontrado")
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-    cursor.execute("DELETE FROM Usuarios WHERE id_usuario=%s", (id,))
-    return {"mensaje": "Usuario eliminado"}
+    cursor.execute("DELETE FROM Comentario WHERE ID_usuario = %s", (id,))
+    cursor.execute("DELETE FROM Likes     WHERE id_usuario  = %s", (id,))
+    cursor.execute("DELETE FROM Usuarios  WHERE id          = %s", (id,))
+    db.commit()
 
+    return {"success": True, "mensaje": "Usuario eliminado"}
 
 # =========================
 # ADMIN ESPECIES

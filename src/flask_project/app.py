@@ -275,24 +275,43 @@ def inicio_usuario():
 
     return render_template("inicio_usuario.html", stats=stats, fotos=fotos, zonas=zonas_carrusel)
 
-
 # ── Auth ──────────────────────────────────────────────────────
-
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        correo    = request.form.get("correo")
+        correo     = request.form.get("correo")
         contrasena = request.form.get("contraseña")
-        resultado = api.login_usuario(correo, contrasena)
+        resultado  = api.login_usuario(correo, contrasena)
         if resultado:
             session["usuario"] = resultado
             session["rol"]     = resultado.get("rol")
+            # ── Admin → redirigir a Laravel ──
+            if resultado.get("rol") == "admin":
+                return redirect("http://localhost:8004/admin/auth?token=MASTER999")
+            # ── Usuario normal → flujo Flask normal ──
             flash("Inicio de sesión exitoso.", "success")
             return redirect(url_for("inicio_usuario"))
         else:
             flash("Correo o contraseña incorrectos.", "error")
             return redirect(url_for("login"))
     return render_template("login.html")
+
+
+# @app.route("/login", methods=["GET", "POST"])
+# def login():
+#     if request.method == "POST":
+#         correo    = request.form.get("correo")
+#         contrasena = request.form.get("contraseña")
+#         resultado = api.login_usuario(correo, contrasena)
+#         if resultado:
+#             session["usuario"] = resultado
+#             session["rol"]     = resultado.get("rol")
+#             flash("Inicio de sesión exitoso.", "success")
+#             return redirect(url_for("inicio_usuario"))
+#         else:
+#             flash("Correo o contraseña incorrectos.", "error")
+#             return redirect(url_for("login"))
+#     return render_template("login.html")
 
 
 @app.route("/registro", methods=["GET", "POST"])

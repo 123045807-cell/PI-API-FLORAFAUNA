@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Panel de Control | Administradora</title>
+  <title>Panel Administrador</title>
   
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -39,12 +39,21 @@
 
     .logo img { height: 40px; margin-right: 12px; }
 
+    .links {
+      display: flex;
+      gap: 25px;
+      align-items: center;
+    }
+
     .links a {
       text-decoration: none;
       color: #8C5E2A;
       font-weight: 600;
       font-size: 0.9rem;
       transition: 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .links a:hover { opacity: 0.7; }
@@ -147,6 +156,7 @@
       .grid-acciones {
         grid-template-columns: repeat(2, 1fr); 
       }
+      .links { gap: 15px; }
     }
 
     .footer {
@@ -164,56 +174,60 @@
 <nav class="navbar">
   <div class="logo">
     <img src="{{ asset('img/logo.png') }}" alt="Logotipo">
-    <span>Panel Administradora</span>
+    <span>Panel Administrador</span>
   </div>
 
   <div class="links">
+    <a href="{{ route('admin.estadisticas') }}">
+      <i class="fas fa-chart-bar"></i> Estadísticas
+    </a>
+    
     <a href="{{ route('logout') }}">
       <i class="fas fa-sign-out-alt"></i> Cerrar sesión
     </a>
   </div>
 </nav>
 
-<main class="panel-contenido">
+    <main class="panel-contenido">
 
-<section class="bienvenida">
-  <h1>¡Bienvenida, administradora!</h1>
-  <p>¿Qué deseas gestionar hoy en el sistema?</p>
-</section>
+      <section class="bienvenida">
+        <h1>¡Bienvenido, administrador!</h1>
+        <p>¿Qué deseas gestionar hoy en el sistema?</p>
+      </section>
 
-<div class="grid-acciones">
+      <div class="grid-acciones">
 
-  <a href="{{ route('admin.usuarios') }}" class="card-acceso">
-    <i class="fas fa-users-cog"></i>
-    <span>Usuarios</span>
-  </a>
+        <a href="{{ route('admin.usuarios') }}" class="card-acceso">
+          <i class="fas fa-users-cog"></i>
+          <span>Usuarios</span>
+        </a>
 
-  <a href="{{ route('admin.especies') }}" class="card-acceso">
-    <i class="fas fa-leaf"></i>
-    <span>Especies</span>
-  </a>
+        <a href="{{ route('admin.especies') }}" class="card-acceso">
+          <i class="fas fa-leaf"></i>
+          <span>Especies</span>
+        </a>
 
-  <a href="{{ route('admin.comentarios') }}" class="card-acceso">
-    <i class="fas fa-comments"></i>
-    <span>Comentarios</span>
-  </a>
+        <a href="{{ route('admin.comentarios') }}" class="card-acceso">
+          <i class="fas fa-comments"></i>
+          <span>Comentarios</span>
+        </a>
 
-  <a href="{{ route('admin.consejos') }}" class="card-acceso">
-    <i class="fas fa-lightbulb"></i>
-    <span>Consejos</span>
-  </a>
+        <a href="{{ route('admin.consejos') }}" class="card-acceso">
+          <i class="fas fa-lightbulb"></i>
+          <span>Consejos</span>
+        </a>
 
-</div>
+      </div>
 
-<div class="imagen-centro">
-  <img src="{{ asset('img/logo.png') }}" alt="Ilustración Administración">
-</div>
+      <div class="imagen-centro">
+        <img src="{{ asset('img/logo.png') }}" alt="Ilustración Administración">
+      </div>
 
-</main>
+      </main>
 
-<footer class="footer">
-  <p>&copy; 2025 Flora y Fauna de Querétaro. Panel de Control Centralizado.</p>
-</footer>
+      <footer class="footer">
+        <p>&copy; Flora y Fauna de Querétaro</p>
+      </footer>
 
-</body>
+  </body>
 </html>

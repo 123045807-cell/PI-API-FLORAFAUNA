@@ -52,6 +52,8 @@ services:
     working_dir: /var/www
     volumes:
       - ./src/laravel_project:/var/www
+    ports:
+      - "8004:8000"  
     environment:
       DB_HOST: mysql
       DB_PORT: 3306
