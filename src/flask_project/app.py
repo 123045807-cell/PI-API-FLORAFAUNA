@@ -2,6 +2,7 @@ from flask import Flask, render_template, session, redirect, url_for, request, f
 from config import Config
 import api_client as api
 import unicodedata
+import re
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -149,6 +150,63 @@ def get_field(data, keys, default=""):
     return default
 
 
+def is_valid_email(email):
+    if not email or not isinstance(email, str):
+        return False
+    return bool(re.match(r"^[^@\s]+@[^@\s]+\.[^@\s]+$", email.strip()))
+
+
+def is_valid_name(value):
+    if not value or not isinstance(value, str):
+        return False
+    pattern = r"^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'-]+$"
+    return bool(re.match(pattern, value.strip()))
+
+
+def validate_perfil_form(data):
+    errors = []
+    nombre = (data.get("nombre") or "").strip()
+    apellido_paterno = (data.get("apellido_paterno") or "").strip()
+    apellido_materno = (data.get("apellido_materno") or "").strip()
+    correo = (data.get("correo") or "").strip()
+
+    if not nombre:
+        errors.append("El nombre es obligatorio.")
+    elif len(nombre) < 2:
+        errors.append("El nombre debe tener al menos 2 caracteres.")
+    elif len(nombre) > 50:
+        errors.append("El nombre no puede superar los 50 caracteres.")
+    elif not is_valid_name(nombre):
+        errors.append("El nombre solo puede contener letras, espacios, guiones y apóstrofos.")
+
+    if not apellido_paterno:
+        errors.append("El apellido paterno es obligatorio.")
+    elif len(apellido_paterno) < 2:
+        errors.append("El apellido paterno debe tener al menos 2 caracteres.")
+    elif len(apellido_paterno) > 50:
+        errors.append("El apellido paterno no puede superar los 50 caracteres.")
+    elif not is_valid_name(apellido_paterno):
+        errors.append("El apellido paterno solo puede contener letras, espacios, guiones y apóstrofos.")
+
+    if not apellido_materno:
+        errors.append("El apellido materno es obligatorio.")
+    elif len(apellido_materno) < 2:
+        errors.append("El apellido materno debe tener al menos 2 caracteres.")
+    elif len(apellido_materno) > 50:
+        errors.append("El apellido materno no puede superar los 50 caracteres.")
+    elif not is_valid_name(apellido_materno):
+        errors.append("El apellido materno solo puede contener letras, espacios, guiones y apóstrofos.")
+
+    if not correo:
+        errors.append("El correo electrónico es obligatorio.")
+    elif len(correo) > 120:
+        errors.append("El correo electrónico no puede superar los 120 caracteres.")
+    elif not is_valid_email(correo):
+        errors.append("Ingrese un correo electrónico válido.")
+
+    return errors
+
+
 def normalizar_consejo(consejo):
     if not isinstance(consejo, dict):
         return consejo
@@ -269,14 +327,35 @@ def perfil():
     if not usuario:
         return redirect(url_for("login"))
 
+    editing_mode = False
     if request.method == "POST" and isinstance(usuario, dict):
-        usuario["nombre"] = request.form.get("nombre", usuario.get("nombre", "")).strip()
-        usuario["apellidoPaterno"] = request.form.get("apellido_paterno", usuario.get("apellidoPaterno", "")).strip()
-        usuario["apellidoMaterno"] = request.form.get("apellido_materno", usuario.get("apellidoMaterno", "")).strip()
-        usuario["correo"] = request.form.get("correo", usuario.get("correo", usuario.get("email", ""))).strip()
-        session["usuario"] = usuario
-        flash("Perfil actualizado correctamente.", "success")
-        return redirect(url_for("perfil"))
+        data = {
+            "nombre": request.form.get("nombre", usuario.get("nombre", "")).strip(),
+            "apellido_paterno": request.form.get("apellido_paterno", usuario.get("apellidoPaterno", "")).strip(),
+            "apellido_materno": request.form.get("apellido_materno", usuario.get("apellidoMaterno", "")).strip(),
+            "correo": request.form.get("correo", usuario.get("correo", usuario.get("email", ""))).strip(),
+        }
+
+        errors = validate_perfil_form(data)
+        if errors:
+            usuario.update({
+                "nombre": data["nombre"],
+                "apellidoPaterno": data["apellido_paterno"],
+                "apellidoMaterno": data["apellido_materno"],
+                "correo": data["correo"],
+            })
+            session["usuario"] = usuario
+            for error in errors:
+                flash(error, "error")
+            editing_mode = True
+        else:
+            usuario["nombre"] = data["nombre"]
+            usuario["apellidoPaterno"] = data["apellido_paterno"]
+            usuario["apellidoMaterno"] = data["apellido_materno"]
+            usuario["correo"] = data["correo"]
+            session["usuario"] = usuario
+            flash("Perfil actualizado correctamente.", "success")
+            return redirect(url_for("perfil"))
 
     if isinstance(usuario, dict):
         nombre = get_field(usuario, ["nombre", "Nombre", "first_name", "firstName"])
@@ -306,7 +385,7 @@ def perfil():
             "correo": "",
         }
 
-    return render_template("perfil.html", usuario=usuario)
+    return render_template("perfil.html", usuario=usuario, editing=editing_mode)
 
 
 # ── Contenido ─────────────────────────────────────────────────
