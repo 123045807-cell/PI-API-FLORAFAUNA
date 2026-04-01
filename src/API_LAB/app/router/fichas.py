@@ -43,7 +43,7 @@ def obtener_especie(id: int, db=Depends(get_db), user=Depends(require_api_key)):
             fo.url_imagen
         FROM Especies e
         LEFT JOIN Familia f ON e.id_familia = f.ID
-        LEFT JOIN Fotografia fo ON fo.id_especie = e.ID
+       LEFT JOIN Fotografia fo ON fo.id_especie = e.ID
         WHERE e.ID = %s
     """, (id,))
     especie = cursor.fetchone()
