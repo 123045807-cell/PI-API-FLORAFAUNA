@@ -171,16 +171,16 @@
                     
                     <div class="form-group">
                         <label>Título del Consejo</label>
-                        <input type="text" name="titulo" value="{{ old('titulo') }}" 
+                        <input type="text" name="titulo" value="{{ old('titulo') }}"
                             class="@error('titulo') is-invalid @enderror" 
-                            placeholder="Ej: Cuidado del agua" />
+                            placeholder="Ej: Cuidado del agua" required minlength="3" maxlength="150"/>
                         @error('titulo') <div class="error-feedback">{{ $message }}</div> @enderror
                     </div>
 
                     <div class="form-group">
                         <label>Contenido</label>
                         <textarea name="consejo" class="@error('consejo') is-invalid @enderror" 
-                                placeholder="Describe el consejo aquí...">{{ old('consejo') }}</textarea>
+                                placeholder="Describe el consejo aquí..." required minlength="10" maxlength="500">{{ old('consejo') }}</textarea>
                         @error('consejo') <div class="error-feedback">{{ $message }}</div> @enderror
                     </div>
 
@@ -188,20 +188,20 @@
                         <div class="form-group">
                             <label>Fecha</label>
                             <input type="date" name="fecha" value="{{ old('fecha') }}" 
-                                class="@error('fecha') is-invalid @enderror" />
+                                class="@error('fecha') is-invalid @enderror" required/>
                             @error('fecha') <div class="error-feedback">{{ $message }}</div> @enderror
                         </div>
                         <div class="form-group">
                             <label>Hora</label>
                             <input type="time" name="hora" value="{{ old('hora') }}" 
-                                class="@error('hora') is-invalid @enderror" />
+                                class="@error('hora') is-invalid @enderror" required/>
                             @error('hora') <div class="error-feedback">{{ $message }}</div> @enderror
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label>Zona Aplicable</label>
-                        <select name="zona" class="@error('zona') is-invalid @enderror">
+                        <select name="zona" class="@error('zona') is-invalid @enderror" required>
                             <option value="" disabled {{ old('zona') ? '' : 'selected' }}>Selecciona una zona</option>
                             @foreach($zonas as $z)
                                 <option value="{{ $z['ID'] ?? $z['id'] }}" {{ old('zona') == ($z['ID'] ?? $z['id']) ? 'selected' : '' }}>
