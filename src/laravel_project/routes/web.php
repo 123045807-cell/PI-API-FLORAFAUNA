@@ -23,7 +23,8 @@ Route::middleware('admin.auth')->group(function () {
 
 
     Route::get('/admin/comentarios', [AdminComentariosController::class, 'index'])  ->name('admin.comentarios');
-    Route::post('/admin/comentarios/{id}/eliminar',[AdminComentariosController::class, 'destroy'])->name('admin.comentarios.destroy');
+    Route::delete('/admin/comentarios/{id}/eliminar',[AdminComentariosController::class, 'destroy'])
+    ->name('admin.comentarios.destroy');
 
   
     Route::get('/admin/consejos', [AdminConsejosController::class, 'index']) ->name('admin.consejos');
