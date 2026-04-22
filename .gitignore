@@ -1,0 +1,18 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Laravel
+/src/laravel_project/vendor/
+/src/laravel_project/.env
+/src/laravel_project/storage/logs/
+/src/laravel_project/bootstrap/cache/
+
+# Entornos
+.env
+*.env
+
+# MySQL data
+mysql_lab_data/
