@@ -16,3 +16,6 @@ __pycache__/
 
 # MySQL data
 mysql_lab_data/
+*.pyc
+*.pyc
+/src/API_LAB/app/router/__pycache__
